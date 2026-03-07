@@ -58,10 +58,34 @@ def quick_sort(arr, low=None, high=None):
     return arr
 
 
-# ── Demo ─────────────────────────────────────────────────────────────────────
-if __name__ == "__main__":
-    data = [64, 34, 25, 12, 22, 11, 90]
-    print("Bubble   :", bubble_sort(data))
-    print("Selection:", selection_sort(data))
-    print("Insertion:", insertion_sort(data))
-    print("Quick    :", quick_sort(data[:]))
+
+data = [64, 34, 25, 12, 22, 11, 90]
+
+def merge(left, right):
+    result = []
+    i = j = 0
+    while i < len(left) and j < len(right):
+        if left[i] <= right[j]:
+            result.append(left[i])
+            i += 1
+        else:
+            result.append(right[j])
+            j += 1
+    return result + left[i:] + right[j:]
+
+
+def merge_sort(arr):
+    if len(arr) <= 1:
+        return arr
+    mid = len(arr) // 2
+    left  = merge_sort(arr[:mid])
+    right = merge_sort(arr[mid:])
+    return merge(left, right)
+
+
+
+print("Merge    :", merge_sort(data))
+print("Bubble   :", bubble_sort(data))
+print("Selection:", selection_sort(data))
+print("Insertion:", insertion_sort(data))
+print("Quick    :", quick_sort(data[:]))
