@@ -2,15 +2,25 @@
 
 def tournament_method(arr):
     n=len(arr)
-    for i in range(n):
-        if(len(arr)==2):
-            if(arr[1]>arr[0]):
-                return arr[1]
-            else:
-                return arr[0]
-    else:
-        if(arr[i]>arr[i+1]):
-            arr[i+1]=arr[i]
+    comparisons=0
+    assignments=0
+    if(n==1):
+        return arr[0]
+    if (n == 2):
+        if (arr[1] > arr[0]):
+            comparisons+=1
+            return arr[1]
         else:
-            arr[i]=arr[i+1]
+            return arr[0]
+    winners=[]
+    for i in range(0,n-1,2):
+        comparisons += 1
+       if(arr[i] > arr[i+1]):
+           winners.append(arr[i])
+       else:
+           comparisons+=1
+            winners.append(arr[i+1])
+    if(n%2==0):
+        winners.append(arr[-1])
+    result= tournament_method(winners)
            
