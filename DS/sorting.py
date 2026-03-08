@@ -62,29 +62,34 @@ def quick_sort(arr, low=None, high=None):
 data = [64, 34, 25, 12, 22, 11, 90]
 
 def merge(left, right):
+    comparisons =0
     result = []
     i = j = 0
     while i < len(left) and j < len(right):
+        comparisons +=2
         if left[i] <= right[j]:
             result.append(left[i])
             i += 1
+            comparisons+=1
         else:
             result.append(right[j])
             j += 1
-    return result + left[i:] + right[j:]
+    return result + left[i:] + right[j:] 
 
 
-def merge_sort(arr):
+def merge_sort_recusion(arr):
+    comp=0
     if len(arr) <= 1:
         return arr
+        comp += 1
     mid = len(arr) // 2
-    left  = merge_sort(arr[:mid])
-    right = merge_sort(arr[mid:])
+    left  = merge_sort_recusion(arr[:mid])
+    right = merge_sort_recusion(arr[mid:])
     return merge(left, right)
 
 
 
-print("Merge    :", merge_sort(data))
+print("Merge    :", merge_sort_recusion(data))
 print("Bubble   :", bubble_sort(data))
 print("Selection:", selection_sort(data))
 print("Insertion:", insertion_sort(data))

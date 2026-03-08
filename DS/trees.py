@@ -13,8 +13,6 @@ class TreeNode:
         return f"TreeNode({self.data})"
 
 
-
-
 class BST:
     def __init__(self):
         self.root = None
@@ -33,7 +31,6 @@ class BST:
             node.right = self._insert(node.right, data)
         return node 
 
-
     def search(self, data):
         """Return True if data exists in the tree."""
         return self._search(self.root, data)
@@ -47,7 +44,6 @@ class BST:
             if data < node.data \
             else self._search(node.right, data))
 
-
     def delete(self, data):
         self.root = self._delete(self.root, data)
 
@@ -59,12 +55,12 @@ class BST:
         elif data > node.data:
             node.right = self._delete(node.right, data)
         else:
-            # Search for the node to delete
+            # Found the node to delete
             if node.left is None:   
                 return node.right
             if node.right is None:  
                 return node.left
-            # Two children: replace with in-order successor (min of right subtree or max to the left)
+            # Two children: replace with in-order successor (min of right subtree)
             successor = self._min_node(node.right)
             node.data  = successor.data
             node.right = self._delete(node.right, successor.data)
@@ -75,9 +71,8 @@ class BST:
             node = node.left
         return node
 
-
     def inorder(self):
-        """LOR"""
+        """L -> Root -> R"""
         traversal = []
         self._inorder(self.root, traversal)
         return traversal
@@ -89,20 +84,19 @@ class BST:
             self._inorder(node.right, traversal)
 
     def preorder(self):
-        """ROOt->LEFT->RIGHT RORI"""
+        """Root -> Left -> Right"""
         result = []
         self._preorder(self.root, result)
         return result
 
     def _preorder(self, node, result):
-        #ROOT->LEFt->RIGHT
         if node:
             result.append(node.data)
             self._preorder(node.left,  result)
             self._preorder(node.right, result)
 
     def postorder(self):
-        """Left → Right → Root"""
+        """Left -> Right -> Root"""
         result = []
         self._postorder(self.root, result)
         return result
@@ -168,11 +162,49 @@ class BST:
     def __repr__(self):
         return f"BST(inorder={self.inorder()})"
 
+    # ── Visual Representation ────────────────────────────────────────────────
+    
+    def __str__(self):
+        if self.root is None:
+            return "Empty BST"
+        return self._build_tree_str(self.root, "", True, "Root: ")
 
+    def _build_tree_str(self, node, prefix="", is_last=True, branch_label=""):
+        if node is None:
+            return ""
+        
+        # Build the string for the current node
+        result = prefix
+        if prefix:
+            result += "└── " if is_last else "├── "
+            
+        result += f"{branch_label}{node.data}\n"
+        
+        # Calculate the prefix for the children
+        child_prefix = prefix + ("    " if is_last else "│   ")
+        
+        # Recursively build left and right children
+        if node.left and not node.right:
+            # Only has a left child, so it's technically the "last" printed item for this node
+            result += self._build_tree_str(node.left, child_prefix, True, "L: ")
+        elif node.left and node.right:
+            # Has both. Left is printed first (not last), Right is printed second (is last).
+            result += self._build_tree_str(node.left, child_prefix, False, "L: ")
+            result += self._build_tree_str(node.right, child_prefix, True, "R: ")
+        elif node.right:
+            # Only has right child
+            result += self._build_tree_str(node.right, child_prefix, True, "R: ")
+            
+        return result
+
+
+# ── Testing the BST ──────────────────────────────────────────────────────────
 
 bst = BST()
-for v in [5,6,16,62,61,65,51,7,9,11]:
+for v in [5, 6, 16, 62, 61, 65, 51, 7, 9, 11]:
     bst.insert(v)
-print("the bst inorder traversal: "+str(bst.inorder()))
-print("the bst postorder traversal: "+str(bst.postorder()))
-print("the bst preorder traversale is: "+str(bst.preorder()))
+
+print(bst) # This automatically calls the new __str__ method
+print("The BST inorder traversal:   " + str(bst.inorder()))
+print("The BST postorder traversal: " + str(bst.postorder()))
+print("The BST preorder traversal:  " + str(bst.preorder()))

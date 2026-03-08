@@ -79,3 +79,14 @@ class LinkedList:
 
 def count(node):
     return 1 + count(node.next) if node else 0
+
+def main():
+    new_node = Node(5)
+    ll = LinkedList()
+    ll.append(6)
+    ll.size()
+    print(ll.head)
+
+
+main()
+    

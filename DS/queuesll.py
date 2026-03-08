@@ -39,7 +39,7 @@ class Queue:
         while curr:
             items.append(str(curr.data))
             curr = curr.next
-        return "FRONT -> " + " -> ".join(items) + " -> None"
+        return "FRONT -> " + " -> ".join(items) + " <- REAR"
     
 myQue = Queue()
 for q in [15,1,5,21,1,6,1,56,541,6,41,16,1,621]:
