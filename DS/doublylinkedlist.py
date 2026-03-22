@@ -1,4 +1,4 @@
-# ── Doubly Linked List ────────────────────────────────────────────────────────
+
 import os
 
 
@@ -20,12 +20,11 @@ class DoublyLinkedList:
         s    = "None <-> "
         curr = self.head
         while curr:
-            s   += f "{curr.data} <->
+            s   += f"{curr.data} <-> "
             curr = curr.next
         s += "None"
         return s
 
-    # ── Core Operations ───────────────────────────────────────────────────────
 
     def append(self, data):
         new_node = Node(data)

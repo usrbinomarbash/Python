@@ -1,4 +1,3 @@
-# ── Queue (Linked List implementation) ───────────────────────────────────────
 
 
 class Node:

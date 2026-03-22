@@ -45,6 +45,7 @@ class Heap:
 
     def heapify(self, arr):
         self.heap = arr[:]
+                                ## last grandparent keep going up start from last element
         for i in range((len(self.heap) - 2) // 2, -1, -1):
             self._heapify_down(i)
 
@@ -93,7 +94,7 @@ class Heap:
         return result
 
 
-# ── Menu ──────────────────────────────────────────────────────────────────────
+
 
 def menu():
     print("\n\t\t----------------------------------------")
