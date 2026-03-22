@@ -1,3 +1,4 @@
+# ── Singly Linked List ────────────────────────────────────────────────────────
 import os
 
 
@@ -9,42 +10,56 @@ class Node:
 
 class SinglyLinkedList:
     def __init__(self):
-        self.head = None
-        self.tail = None
+        self.head     = None
+        self.tail     = None
+        self.circular = False
 
     def __repr__(self):
         if not self.head:
             return "HEAD -> None"
-        s = "HEAD -> "
+        s    = "HEAD -> "
         curr = self.head
-        while curr:
-            s += f"{curr.data} -> "
+        while curr.next and curr.next != self.head:
+            s   += f"{curr.data} -> "
             curr = curr.next
-        s += "None"
+        s += f"{curr.data}"
+        s += " -> (back to HEAD)" if self.circular else " -> None"
         return s
+
+    # ── Core Operations ───────────────────────────────────────────────────────
 
     def append(self, data):
         new_node = Node(data)
         if not self.head:
             self.head = self.tail = new_node
+            if self.circular:
+                self.tail.next = self.head
             return
         self.tail.next = new_node
-        self.tail = new_node
+        self.tail      = new_node
+        if self.circular:
+            self.tail.next = self.head
 
     def prepend(self, data):
         new_node = Node(data)
         if not self.head:
             self.head = self.tail = new_node
+            if self.circular:
+                self.tail.next = self.head
             return
         new_node.next = self.head
-        self.head = new_node
+        self.head     = new_node
+        if self.circular:
+            self.tail.next = self.head
 
     def delete(self, target):
         if not self.head:
             print("\n\t\tLinked list is EMPTY!")
             return
 
-        # target is the only node
+        stop = self.head if self.circular else None
+
+        # only node
         if self.head == self.tail:
             if str(self.head.data) == str(target):
                 self.head = self.tail = None
@@ -54,18 +69,22 @@ class SinglyLinkedList:
                 print(f"\n\t\t'{target}' was NOT FOUND in the list!")
                 return
 
-        # target is the head
+        # target is head
         if str(self.head.data) == str(target):
             self.head = self.head.next
+            if self.circular:
+                self.tail.next = self.head
             print(f"\n\t\t'{target}' was deleted successfully!")
             return
 
         curr = self.head
-        while curr.next:
+        while curr.next and curr.next != stop:
             if str(curr.next.data) == str(target):
                 if curr.next == self.tail:
                     self.tail = curr
                 curr.next = curr.next.next
+                if self.circular:
+                    self.tail.next = self.head
                 print(f"\n\t\t'{target}' was deleted successfully!")
                 return
             curr = curr.next
@@ -73,33 +92,47 @@ class SinglyLinkedList:
         print(f"\n\t\t'{target}' was NOT FOUND in the list!")
 
     def search(self, target):
-        curr = self.head
+        if not self.head:
+            return -1
+        curr  = self.head
         index = 0
+        stop  = self.head if self.circular else None
         while curr:
             if str(curr.data) == str(target):
                 return index
             curr = curr.next
             index += 1
+            if curr == stop:
+                break
         return -1
 
     def size(self):
+        if not self.head:
+            return 0
         count = 0
-        curr = self.head
+        curr  = self.head
+        stop  = self.head if self.circular else None
         while curr:
             count += 1
-            curr = curr.next
+            curr   = curr.next
+            if curr == stop:
+                break
         return count
 
     def reverse(self):
-        prev = None
-        curr = self.head
+        if self.circular:
+            self.tail.next = None         # temporarily break circle
+        prev      = None
+        curr      = self.head
         self.tail = self.head
         while curr:
-            next_node  = curr.next
-            curr.next  = prev
-            prev       = curr
-            curr       = next_node
+            next_node = curr.next
+            curr.next = prev
+            prev      = curr
+            curr      = next_node
         self.head = prev
+        if self.circular:
+            self.tail.next = self.head    # restore circle
 
     def create_from_file(self, filename):
         if not os.path.exists(filename):
@@ -112,6 +145,40 @@ class SinglyLinkedList:
                     self.append(value)
         print(f"\n\t\tLinked list created from '{filename}' successfully!")
 
+    # ── Circular Operations ───────────────────────────────────────────────────
+
+    def make_circular(self):
+        if not self.head:
+            print("\n\t\tLinked list is EMPTY! Cannot make circular.")
+            return
+        if self.circular:
+            print("\n\t\tList is ALREADY circular!")
+            return
+        self.tail.next = self.head
+        self.circular  = True
+        print("\n\t\tList is now CIRCULAR! Tail points back to Head.")
+
+    def break_circular(self):
+        if not self.circular:
+            print("\n\t\tList is NOT circular!")
+            return
+        self.tail.next = None
+        self.circular  = False
+        print("\n\t\tCircular link BROKEN! List is now linear.")
+
+    def is_circular(self):
+        """Verify with Floyd's Cycle Detection (tortoise and hare)."""
+        if not self.head:
+            return False
+        slow = self.head
+        fast = self.head
+        while fast and fast.next:
+            slow = slow.next
+            fast = fast.next.next
+            if slow == fast:
+                return True
+        return False
+
 
 # ── Menu ──────────────────────────────────────────────────────────────────────
 
@@ -122,7 +189,8 @@ def menu():
     print("\n\t\t3. Delete a Node")
     print("\n\t\t4. Traverse the Linked List")
     print("\n\t\t5. Search / Reverse / Size")
-    print("\n\t\t6. Quit")
+    print("\n\t\t6. Circular Operations")
+    print("\n\t\t7. Quit")
     print("\n\t\t----------------------------------------")
     print("\n\t\tYour choice please: ", end="")
 
@@ -137,7 +205,7 @@ def sub_menu_5(ll):
     if sub == 'a':
         print("\n\t\tEnter value to search: ", end="")
         target = input().strip()
-        idx = ll.search(target)
+        idx    = ll.search(target)
         if idx == -1:
             print(f"\n\t\t'{target}' was NOT FOUND in the list!")
         else:
@@ -152,6 +220,24 @@ def sub_menu_5(ll):
         print("\n\t\tInvalid sub-option!")
 
 
+def sub_menu_6(ll):
+    print("\n\t\t  --- Circular Options ---")
+    print("\n\t\t  a. Make Circular")
+    print("\n\t\t  b. Break Circular")
+    print("\n\t\t  c. Check if Circular (Floyd's Algorithm)")
+    print("\n\t\t  Choice: ", end="")
+    sub = input().strip().lower()
+    if sub == 'a':
+        ll.make_circular()
+    elif sub == 'b':
+        ll.break_circular()
+    elif sub == 'c':
+        result = ll.is_circular()
+        print(f"\n\t\tList is {'CIRCULAR' if result else 'NOT circular'}! (Floyd's Detection)")
+    else:
+        print("\n\t\tInvalid sub-option!")
+
+
 def main():
     ll = SinglyLinkedList()
 
@@ -160,7 +246,7 @@ def main():
         try:
             choice = int(input().strip())
         except ValueError:
-            print("\n\t\tWrong input! Please enter 1-6.")
+            print("\n\t\tWrong input! Please enter 1-7.")
             continue
 
         if choice == 1:
@@ -198,11 +284,14 @@ def main():
             sub_menu_5(ll)
 
         elif choice == 6:
+            sub_menu_6(ll)
+
+        elif choice == 7:
             print("\n\t\tYou decided to QUIT\n\n\t\tBYE!\n")
             break
 
         else:
-            print("\n\t\tWrong input! Please enter 1-6.")
+            print("\n\t\tWrong input! Please enter 1-7.")
 
 
 main()
