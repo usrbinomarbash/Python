@@ -34,10 +34,12 @@ class Heap:
         n = len(self.heap)
         while True:
             smallest = i
-            lef      = self._left_child(i)
+            left      = self._left_child(i)
             right    = self._right_child(i)
-            if lef   < n and self.heap[lef]   < self.heap[smallest]: smallest = lef
-            if right < n and self.heap[right] < self.heap[smallest]: smallest = right
+            if left<n and (self.heap[left]< self.heap[smallest]): 
+                smallest = left
+            if right<n and (self.heap[right]<self.heap[smallest]): 
+                smallest = right
             if smallest == i:
                 break
             self._swap(i, smallest)
