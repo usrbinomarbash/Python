@@ -1,7 +1,5 @@
-# ── Trees ────────────────────────────────────────────────────────────────────
-# Binary Tree | Binary Search Tree (BST) | AVL Tree
+# ── Binary Search Tree (BST) ──────────────────────────────────────────────────
 
-# ─── Binary Tree Node ────────────────────────────────────────────────────────
 
 class TreeNode:
     def __init__(self, data):
@@ -17,7 +15,7 @@ class BST:
     def __init__(self):
         self.root = None
 
-    # ── insert ───────────────────────────────────────────────────────────────
+    # ── insert ────────────────────────────────────────────────────────────────
 
     def insert(self, data):
         self.root = self._insert(self.root, data)
@@ -29,10 +27,11 @@ class BST:
             node.left  = self._insert(node.left,  data)
         elif data > node.data:
             node.right = self._insert(node.right, data)
-        return node 
+        return node
+
+    # ── search ────────────────────────────────────────────────────────────────
 
     def search(self, data):
-        """Return True if data exists in the tree."""
         return self._search(self.root, data)
 
     def _search(self, node, data):
@@ -40,9 +39,11 @@ class BST:
             return False
         if node.data == data:
             return True
-        return(self._search(node.left, data) 
-            if data < node.data \
-            else self._search(node.right, data))
+        return (self._search(node.left,  data)
+                if data < node.data
+                else self._search(node.right, data))
+
+    # ── delete ────────────────────────────────────────────────────────────────
 
     def delete(self, data):
         self.root = self._delete(self.root, data)
@@ -55,13 +56,11 @@ class BST:
         elif data > node.data:
             node.right = self._delete(node.right, data)
         else:
-            # Found the node to delete
-            if node.left is None:   
+            if node.left is None:
                 return node.right
-            if node.right is None:  
+            if node.right is None:
                 return node.left
-            # Two children: replace with in-order successor (min of right subtree)
-            successor = self._min_node(node.right)
+            successor  = self._min_node(node.right)
             node.data  = successor.data
             node.right = self._delete(node.right, successor.data)
         return node
@@ -71,20 +70,19 @@ class BST:
             node = node.left
         return node
 
-    def inorder(self):
-        """L -> Root -> R"""
-        traversal = []
-        self._inorder(self.root, traversal)
-        return traversal
 
-    def _inorder(self, node, traversal):
+    def inorder(self):
+        result = []
+        self._inorder(self.root, result)
+        return result
+
+    def _inorder(self, node, result):
         if node:
-            self._inorder(node.left,  traversal)
-            traversal.append(node.data)
-            self._inorder(node.right, traversal)
+            self._inorder(node.left,  result)
+            result.append(node.data)
+            self._inorder(node.right, result)
 
     def preorder(self):
-        """Root -> Left -> Right"""
         result = []
         self._preorder(self.root, result)
         return result
@@ -96,7 +94,6 @@ class BST:
             self._preorder(node.right, result)
 
     def postorder(self):
-        """Left -> Right -> Root"""
         result = []
         self._postorder(self.root, result)
         return result
@@ -108,7 +105,6 @@ class BST:
             result.append(node.data)
 
     def level_order(self):
-        """BFS level by level using a queue."""
         if not self.root:
             return []
         result, queue = [], [self.root]
@@ -119,14 +115,13 @@ class BST:
             if node.right: queue.append(node.right)
         return result
 
-    # ── properties ───────────────────────────────────────────────────────────
 
     def height(self):
         return self._height(self.root)
 
     def _height(self, node):
         if node is None:
-            return -1   # height of empty tree = -1
+            return -1
         return 1 + max(self._height(node.left), self._height(node.right))
 
     def count_nodes(self):
@@ -138,7 +133,6 @@ class BST:
         return 1 + self._count(node.left) + self._count(node.right)
 
     def is_valid_bst(self):
-        """Verify BST property holds for the whole tree."""
         return self._is_valid(self.root, float('-inf'), float('inf'))
 
     def _is_valid(self, node, min_val, max_val):
@@ -146,8 +140,8 @@ class BST:
             return True
         if not (min_val < node.data < max_val):
             return False
-        return (self._is_valid(node.left,  min_val,    node.data) and
-                self._is_valid(node.right, node.data,  max_val))
+        return (self._is_valid(node.left,  min_val,   node.data) and
+                self._is_valid(node.right, node.data, max_val))
 
     def min_value(self):
         if not self.root: return None
@@ -162,8 +156,8 @@ class BST:
     def __repr__(self):
         return f"BST(inorder={self.inorder()})"
 
-    # ── Visual Representation ────────────────────────────────────────────────
-    
+    # ── visual representation ─────────────────────────────────────────────────
+
     def __str__(self):
         if self.root is None:
             return "Empty BST"
@@ -172,39 +166,147 @@ class BST:
     def _build_tree_str(self, node, prefix="", is_last=True, branch_label=""):
         if node is None:
             return ""
-        
-        # Build the string for the current node
         result = prefix
         if prefix:
             result += "└── " if is_last else "├── "
-            
         result += f"{branch_label}{node.data}\n"
-        
-        # Calculate the prefix for the children
         child_prefix = prefix + ("    " if is_last else "│   ")
-        
-        # Recursively build left and right children
-        if node.left and not node.right:
-            # Only has a left child, so it's technically the "last" printed item for this node
-            result += self._build_tree_str(node.left, child_prefix, True, "L: ")
-        elif node.left and node.right:
-            # Has both. Left is printed first (not last), Right is printed second (is last).
-            result += self._build_tree_str(node.left, child_prefix, False, "L: ")
-            result += self._build_tree_str(node.right, child_prefix, True, "R: ")
+        if node.left and node.right:
+            result += self._build_tree_str(node.left,  child_prefix, False, "L: ")
+            result += self._build_tree_str(node.right, child_prefix, True,  "R: ")
+        elif node.left:
+            result += self._build_tree_str(node.left,  child_prefix, True,  "L: ")
         elif node.right:
-            # Only has right child
-            result += self._build_tree_str(node.right, child_prefix, True, "R: ")
-            
+            result += self._build_tree_str(node.right, child_prefix, True,  "R: ")
         return result
 
 
-# ── Testing the BST ──────────────────────────────────────────────────────────
 
-bst = BST()
-for v in [5, 6, 16, 62, 61, 65, 51, 7, 9, 11]:
-    bst.insert(v)
+def menu():
+    print("\n\t\t----------------------------------------")
+    print("\n\t\t1. Insert a Node")
+    print("\n\t\t2. Search for a Node")
+    print("\n\t\t3. Delete a Node")
+    print("\n\t\t4. Traverse the BST")
+    print("\n\t\t5. Tree Properties")
+    print("\n\t\t6. Quit")
+    print("\n\t\t----------------------------------------")
+    print("\n\t\tYour choice please: ", end="")
 
-print(bst) # This automatically calls the new __str__ method
-print("The BST inorder traversal:   " + str(bst.inorder()))
-print("The BST postorder traversal: " + str(bst.postorder()))
-print("The BST preorder traversal:  " + str(bst.preorder()))
+
+def traverse_menu(bst):
+    print("\n\t\t  --- Traversal Options ---")
+    print("\n\t\t  a. Inorder   (L -> Root -> R)")
+    print("\n\t\t  b. Preorder  (Root -> L -> R)")
+    print("\n\t\t  c. Postorder (L -> R -> Root)")
+    print("\n\t\t  d. Level Order (BFS)")
+    print("\n\t\t  e. Visual Tree")
+    print("\n\t\t  Choice: ", end="")
+    sub = input().strip().lower()
+
+    if sub == 'a':
+        print(f"\n\t\tInorder   : {bst.inorder()}")
+    elif sub == 'b':
+        print(f"\n\t\tPreorder  : {bst.preorder()}")
+    elif sub == 'c':
+        print(f"\n\t\tPostorder : {bst.postorder()}")
+    elif sub == 'd':
+        print(f"\n\t\tLevel Order: {bst.level_order()}")
+    elif sub == 'e':
+        print(f"\n{bst}")
+    else:
+        print("\n\t\tInvalid sub-option!")
+
+
+def properties_menu(bst):
+    print("\n\t\t  --- Tree Properties ---")
+    print("\n\t\t  a. Height")
+    print("\n\t\t  b. Node Count")
+    print("\n\t\t  c. Min Value")
+    print("\n\t\t  d. Max Value")
+    print("\n\t\t  e. Check Valid BST")
+    print("\n\t\t  Choice: ", end="")
+    sub = input().strip().lower()
+
+    if sub == 'a':
+        print(f"\n\t\tHeight     : {bst.height()}")
+    elif sub == 'b':
+        print(f"\n\t\tNode Count : {bst.count_nodes()}")
+    elif sub == 'c':
+        print(f"\n\t\tMin Value  : {bst.min_value()}")
+    elif sub == 'd':
+        print(f"\n\t\tMax Value  : {bst.max_value()}")
+    elif sub == 'e':
+        valid = bst.is_valid_bst()
+        print(f"\n\t\tValid BST? : {'Yes' if valid else 'No'}")
+    else:
+        print("\n\t\tInvalid sub-option!")
+
+
+def main():
+    bst = BST()
+
+    while True:
+        menu()
+        try:
+            choice = int(input().strip())
+        except ValueError:
+            print("\n\t\tWrong input! Please enter 1-6.")
+            continue
+
+        if choice == 1:
+            print("\n\t\tEnter value to insert: ", end="")
+            try:
+                value = int(input().strip())
+                if bst.search(value):
+                    print(f"\n\t\t{value} already exists in the BST!")
+                else:
+                    bst.insert(value)
+                    print(f"\n\t\t{value} was inserted into the BST!")
+            except ValueError:
+                print("\n\t\tInvalid value! Please enter an integer.")
+
+        elif choice == 2:
+            print("\n\t\tEnter value to search: ", end="")
+            try:
+                value = int(input().strip())
+                if bst.search(value):
+                    print(f"\n\t\t{value} was FOUND in the BST!")
+                else:
+                    print(f"\n\t\t{value} was NOT FOUND in the BST!")
+            except ValueError:
+                print("\n\t\tInvalid value! Please enter an integer.")
+
+        elif choice == 3:
+            print("\n\t\tEnter value to delete: ", end="")
+            try:
+                value = int(input().strip())
+                if not bst.search(value):
+                    print(f"\n\t\t{value} was NOT FOUND in the BST!")
+                else:
+                    bst.delete(value)
+                    print(f"\n\t\t{value} was deleted from the BST!")
+            except ValueError:
+                print("\n\t\tInvalid value! Please enter an integer.")
+
+        elif choice == 4:
+            if bst.root is None:
+                print("\n\t\tBST is EMPTY!")
+            else:
+                traverse_menu(bst)
+
+        elif choice == 5:
+            if bst.root is None:
+                print("\n\t\tBST is EMPTY!")
+            else:
+                properties_menu(bst)
+
+        elif choice == 6:
+            print("\n\t\tYou decided to QUIT\n\n\t\tBYE!\n")
+            break
+
+        else:
+            print("\n\t\tWrong input! Please enter 1-6.")
+
+
+main()
