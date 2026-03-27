@@ -2,4 +2,4 @@ colorama==0.4.1
 requests==2.32.2
 PySocks==1.6.8
 argparse==1.4.0
-tqdm==4.31.1
+tqdm==4.66.3
